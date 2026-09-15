@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "repo-analyzer"
+version = "0.1.0"
+description = "CLI tool to explore repositories, inspect architecture, and summarize codebases"
+readme = "spec.md"
+requires-python = ">=3.10"
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.0.0",
+    "google-genai>=0.1.0",
+]
+
+[project.scripts]
+repo-analyzer = "repo_analyzer.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["repo_analyzer*"]
