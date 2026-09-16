@@ -298,7 +298,6 @@ repoAnalyzerCli/
 │   └── test_tree.py            # Tests de renderizado de árbol visual y tablas estadísticas
 ├── pyproject.toml              # Definición del proyecto, dependencias y script de consola
 ├── reporte.md                  # Ejemplo real de reporte arquitectónico generado por Gemini
-├── AGENT.md                    # Directivas y contexto de desarrollo para agentes
 └── README.md                   # Documentación oficial y guía de uso
 ```
 
