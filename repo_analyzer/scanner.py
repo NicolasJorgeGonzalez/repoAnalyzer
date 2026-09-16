@@ -46,6 +46,7 @@ class RepoStats:
     binary_files_count: int = 0
     text_files_count: int = 0
     skipped_large_files_count: int = 0
+    ignored_files_count: int = 0
 
 
 class GitIgnoreRule:
@@ -275,9 +276,10 @@ def scan_repository(
 
     all_files: list[FileInfo] = []
     visited_dirs_count = 0
+    ignored_files_count = 0
 
     def _build_tree(current_dir: Path, current_depth: int) -> dict:
-        nonlocal visited_dirs_count
+        nonlocal visited_dirs_count, ignored_files_count
         visited_dirs_count += 1
 
         if gitignore_matcher is not None:
@@ -302,8 +304,10 @@ def scan_repository(
 
             if entry.is_dir(follow_symlinks=False):
                 if entry.name in dirs_to_ignore:
+                    ignored_files_count += 1
                     continue
                 if gitignore_matcher is not None and gitignore_matcher.is_ignored(entry_path, is_dir=True):
+                    ignored_files_count += 1
                     continue
                 if max_depth is not None and current_depth >= max_depth:
                     continue
@@ -313,8 +317,10 @@ def scan_repository(
 
             elif entry.is_file(follow_symlinks=False):
                 if entry.name in files_to_ignore:
+                    ignored_files_count += 1
                     continue
                 if gitignore_matcher is not None and gitignore_matcher.is_ignored(entry_path, is_dir=False):
+                    ignored_files_count += 1
                     continue
 
                 try:
@@ -355,6 +361,7 @@ def scan_repository(
         binary_files_count=sum(1 for f in all_files if f.is_binary),
         text_files_count=sum(1 for f in all_files if not f.is_binary),
         skipped_large_files_count=sum(1 for f in all_files if f.is_large),
+        ignored_files_count=ignored_files_count,
     )
 
     for f in all_files:

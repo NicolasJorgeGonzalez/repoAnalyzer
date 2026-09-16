@@ -1,4 +1,4 @@
-"""Entrypoint for running repo_analyzer as a module: python -m repo_analyzer."""
+"""CLI entrypoint module for `python -m repo_analyzer`."""
 
 from repo_analyzer.cli import app
 

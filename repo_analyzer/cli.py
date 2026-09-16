@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Optional
+
 import typer
 from rich.console import Console
 from rich.markdown import Markdown
@@ -12,83 +14,83 @@ from repo_analyzer.config import DEFAULT_MODEL
 from repo_analyzer.llm_client import GeminiAnalyzer, LLMAnalysisError, MissingApiKeyError
 from repo_analyzer.prompts import SYSTEM_PROMPT, build_analysis_prompt
 from repo_analyzer.scanner import get_key_files_content, scan_repository
-from repo_analyzer.tree import create_rich_tree, create_stats_table, format_tree_as_text
+from repo_analyzer.tree import (
+    build_file_tree,
+    build_stats_table,
+    build_summary_panel,
+    format_tree_as_text,
+)
+
+console = Console()
 
 app = typer.Typer(
     name="repo-analyzer",
     help="CLI tool to explore repositories and analyze architecture with Gemini.",
     no_args_is_help=True,
 )
-console = Console()
 
 
-@app.command("scan")
+@app.callback()
+def main() -> None:
+    """CLI tool to explore repositories and analyze architecture with Gemini."""
+
+
+@app.command(name="scan", help="Escanear un repositorio local y mostrar estructura y métricas.")
 def scan(
     path: Path = typer.Argument(
-        Path("."),
+        default=Path("."),
         help="Ruta al directorio o repositorio a escanear.",
+        show_default=True,
     ),
-    max_depth: int | None = typer.Option(
+    max_depth: Optional[int] = typer.Option(
         None,
         "--max-depth",
         "-d",
-        help="Límite de profundidad para el escaneo de subdirectorios.",
-    ),
-    no_gitignore: bool = typer.Option(
-        False,
-        "--no-gitignore",
-        help="Ignorar reglas de .gitignore durante el escaneo.",
+        help="Límite de profundidad para recorrer y mostrar el árbol de directorios.",
     ),
     only_stats: bool = typer.Option(
         False,
         "--only-stats",
         "-s",
-        help="Mostrar únicamente la tabla de resumen estadístico.",
+        help="Solo mostrar tabla de estadísticas y panel resumen, sin el árbol de archivos.",
+    ),
+    no_gitignore: bool = typer.Option(
+        False,
+        "--no-gitignore",
+        help="No respetar las reglas definidas en archivos .gitignore.",
     ),
 ) -> None:
-    """Escanea la estructura de un repositorio e imprime su árbol y estadísticas."""
-    target_path = path.resolve()
-    if not target_path.exists():
-        console.print(
-            Panel(
-                f"[bold red]Ruta inexistente:[/bold red] '{target_path}' no existe.",
-                title="[bold red]Error[/bold red]",
-                border_style="red",
-            )
-        )
-        raise typer.Exit(code=1)
-    if not target_path.is_dir():
-        console.print(
-            Panel(
-                f"[bold red]Ruta inválida:[/bold red] '{target_path}' no es un directorio.",
-                title="[bold red]Error[/bold red]",
-                border_style="red",
-            )
-        )
-        raise typer.Exit(code=1)
-
+    """Scan a repository and display file tree and statistics."""
     try:
         files, stats, tree_dict = scan_repository(
-            path=target_path,
+            path=path,
             max_depth=max_depth,
             respect_gitignore=not no_gitignore,
         )
-    except Exception as e:
-        console.print(
-            Panel(
-                f"[bold red]Error durante el escaneo:[/bold red] {e}",
-                title="[bold red]Error de Escaneo[/bold red]",
-                border_style="red",
-            )
-        )
+    except FileNotFoundError as exc:
+        console.print(f"[bold red]Error:[/bold red] {exc}")
+        raise typer.Exit(code=1)
+    except NotADirectoryError as exc:
+        console.print(f"[bold red]Error:[/bold red] {exc}")
+        raise typer.Exit(code=1)
+    except Exception as exc:
+        console.print(f"[bold red]Error inesperado al escanear el repositorio:[/bold red] {exc}")
         raise typer.Exit(code=1)
 
+    resolved_path = path.resolve()
+    root_name = resolved_path.name or str(resolved_path)
+
     if not only_stats:
-        console.print()
-        console.print(create_rich_tree(tree_dict))
+        tree = build_file_tree(tree_dict, root_name=root_name)
+        console.print(tree)
         console.print()
 
-    console.print(create_stats_table(stats))
+    summary_panel = build_summary_panel(stats)
+    console.print(summary_panel)
+    console.print()
+
+    stats_table = build_stats_table(stats)
+    console.print(stats_table)
 
 
 @app.command("analyze")
