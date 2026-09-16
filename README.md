@@ -253,6 +253,8 @@ repo-analyzer analyze [RUTA] [OPCIONES]
   repo-analyzer analyze ./src --max-depth 3 -o reporte-src.md
   ```
 
+> 💡 **Ejemplo real de salida:** Puedes consultar [`reporte.md`](./reporte.md) en la raíz del repositorio para ver un informe de auditoría arquitectónica exhaustivo y real producido por `repo-analyzer` con Gemini sobre un monorepo de producción.
+
 ---
 
 ## 🔬 Detalles Técnicos y Filtrado
@@ -295,6 +297,7 @@ repoAnalyzerCli/
 │   ├── test_scanner.py         # Tests de reglas .gitignore, binarios, límites y estadísticas
 │   └── test_tree.py            # Tests de renderizado de árbol visual y tablas estadísticas
 ├── pyproject.toml              # Definición del proyecto, dependencias y script de consola
+├── reporte.md                  # Ejemplo real de reporte arquitectónico generado por Gemini
 ├── AGENT.md                    # Directivas y contexto de desarrollo para agentes
 └── README.md                   # Documentación oficial y guía de uso
 ```
