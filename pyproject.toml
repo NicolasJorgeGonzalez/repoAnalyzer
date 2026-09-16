@@ -6,7 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "repo-analyzer"
 version = "0.1.0"
 description = "CLI tool to explore repositories, inspect architecture, and summarize codebases"
-readme = "spec.md"
+readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = [
     "typer>=0.12.0",
