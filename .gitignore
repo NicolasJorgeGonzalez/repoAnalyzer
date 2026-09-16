@@ -42,3 +42,8 @@ htmlcov/
 # Outputs
 *.md.tmp
 reporte*.md
+
+# Environment variables & secrets
+.env
+.env.*
+*.env

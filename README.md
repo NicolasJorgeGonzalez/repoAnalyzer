@@ -53,8 +53,8 @@
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/NicolasJorgeGonzalez/repoAnalyzerCli.git
-cd repoAnalyzerCli
+git clone https://github.com/NicolasJorgeGonzalez/repoAnalyzer.git
+cd repoAnalyzer
 ```
 
 ### 2. Crear y activar el entorno virtual
