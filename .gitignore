@@ -48,3 +48,8 @@ reporte*.md
 .env
 .env.*
 *.env
+
+# Agent and planning artifacts
+AGENT.md
+spec.md
+implementation_plan.md
